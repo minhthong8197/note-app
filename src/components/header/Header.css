@@ -1,0 +1,11 @@
+.row {
+    height: 200px;
+    background-color: aquamarine;
+}
+
+.col {
+    background-color: orange;
+    text-align: center;
+    font-size: 60px;
+    font-weight: bold;
+}

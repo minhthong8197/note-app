@@ -1,0 +1,23 @@
+.note-text {
+    line-height: 32px;
+    margin: 0;
+    font-size: 18px;
+}
+
+.note-tools {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    /* align-self: flex-end; */
+}
+
+.note-input {
+    font-weight: bold;
+    text-align: left;
+    flex: 1;
+    min-width: 150px;
+}
+
+.margin {
+    padding: 10px;
+}
