@@ -7,32 +7,28 @@ import './MyBody.css'
 import AddNoteItem from './add-note-item/AddNoteItem'
 import NoteItem from './note-item/NoteItem'
 
-
 class MyBody extends React.Component {
+    gotData = false
+
     constructor(props) {
         super(props)
         this.state = {
-            listNotes: [
-                {
-                    saved: true,
-                    content: 'them responsive'
-                },
-                {
-                    saved: true,
-                    content: 'saved = false => disable save btn'
-                },
-                {
-                    saved: true,
-                    content: 'sua padding bottom'
-                },
-            ],
+            listNotes: [],
         }
         this.onAddNote = this.onAddNote.bind(this)
         this.onRemoveNote = this.onRemoveNote.bind(this)
         this.onNoteChange = this.onNoteChange.bind(this)
     }
 
+    static getDerivedStateFromProps(props, state) {
+        if (state.listNotes.length === 0) return { listNotes: [...props.listNotes] }
+        else {
+            return state
+        }
+    }
+
     renderNoteItems() {
+        console.log(this.state.listNotes)
         return this.state.listNotes.map((noteValue, i) =>
             (
                 <NoteItem
@@ -76,12 +72,12 @@ class MyBody extends React.Component {
 
     render() {
         return (
-            <Row>
-                <Col xs={{ span: 24 }} sm={{ span: 18, offset: 3 }} lg={{span: 12, offset: 6}} className="gray-back">
+            < Row >
+                <Col xs={{ span: 24 }} sm={{ span: 18, offset: 3 }} lg={{ span: 12, offset: 6 }} className="gray-back">
                     {this.renderNoteItems()}
                     <AddNoteItem onAddNote={this.onAddNote} />
                 </Col>
-            </Row>
+            </Row >
         )
     }
 }
