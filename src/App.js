@@ -11,14 +11,14 @@ class App extends Component {
     return (
       <div>
         <Header />
-
         <Query query={gql`
                 {
-                    notes {
-                        _id
-                        content
-                        isActive
-                    }
+                  notes {
+                    _id
+                    content
+                    isActive
+                    saved
+                  }
                 }
             `}>
           {({ loading, error, data }) => {

@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { Row, Col } from 'antd'
 import 'antd/dist/antd.css'
 
@@ -8,8 +7,6 @@ import AddNoteItem from './add-note-item/AddNoteItem'
 import NoteItem from './note-item/NoteItem'
 
 class MyBody extends React.Component {
-    gotData = false
-
     constructor(props) {
         super(props)
         this.state = {
@@ -25,10 +22,10 @@ class MyBody extends React.Component {
         else {
             return state
         }
+        // return { listNotes: [...props.listNotes] }
     }
 
     renderNoteItems() {
-        console.log(this.state.listNotes)
         return this.state.listNotes.map((noteValue, i) =>
             (
                 <NoteItem
@@ -45,7 +42,8 @@ class MyBody extends React.Component {
         let newList = [...this.state.listNotes]
         newList.push({
             saved: false,
-            content: ''
+            content: '',
+            isActive: true
         });
         this.setState({
             listNotes: newList
@@ -64,7 +62,7 @@ class MyBody extends React.Component {
 
     onNoteChange(noteValue, i) {
         let newList = [...this.state.listNotes]
-        newList[i] = noteValue
+        newList[i] = Object.assign(newList[i], noteValue)
         this.setState({
             listNotes: newList
         })

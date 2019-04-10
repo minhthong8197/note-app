@@ -6,11 +6,12 @@ export class Note {
     @ObjectIdColumn() _id?: string
     @Column() content: string
     @Column() time: Date
+    @Column() saved: boolean
     @Column() isActive: boolean
 
     constructor(noteData) {
         if (noteData) {
-            Object.assign(this, noteData, { _id: uuidv1(), isActive: true, time: new Date() })
+            Object.assign(this, noteData, { _id: uuidv1(), saved: true, isActive: true, time: new Date() })
         }
     }
 }

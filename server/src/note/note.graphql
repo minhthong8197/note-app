@@ -4,6 +4,7 @@ type Note {
     _id: ID
     content: String
     time: Date
+    saved: Boolean
     isActive: Boolean
 }
 
@@ -20,4 +21,5 @@ type Mutation {
 
 input DataInputNote {
     content: String!
+    saved: Boolean
 }
