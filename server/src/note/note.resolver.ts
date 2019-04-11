@@ -11,6 +11,7 @@ export class NoteResolver {
     @Query('notes')
     async notes() {
         try {
+            // this.noteService.testAsync()
             return await this.noteService.getNotes()
         } catch (error) {
             throw new ApolloError(error)

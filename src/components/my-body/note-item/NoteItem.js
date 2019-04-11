@@ -2,8 +2,9 @@ import React from 'react'
 import { Row, Col, Icon, Button, Input } from 'antd'
 import 'antd/dist/antd.css'
 import './NoteItem.css'
-import gql from 'graphql-tag'
 import { Mutation } from 'react-apollo'
+// eslint-disable-next-line
+import { NOTES, CREATE_NOTE, UPDATE_NOTE, REMOVE_NOTE } from '../../../services/query'
 
 class NoteItem extends React.Component {
     constructor(props) {
@@ -19,45 +20,64 @@ class NoteItem extends React.Component {
         this.props.onNoteChange(newNoteValue, this.props.index)
     }
 
-    CREATE_NOTE = gql`
-        mutation create($data: DataInputNote!) {
-            createNote(dataInputNote: $data) {
-                _id
-                content
-                time
-                saved
-                isActive
-            }
-        }
-    `;
-
-    UPDATE_NOTE = gql`
-        mutation update($id: ID!, $data: DataInputNote!) {
-            updateNote(_id: $id, dataInputNote: $data) {
-                _id
-                content
-                time
-                saved
-                isActive
-            }
-        }
-    `;
-
-    REMOVE_NOTE = gql`
-        mutation remove($inputId: ID!) {
-            removeNote(_id: $inputId)
-        }
-    `;
-
     render() {
         return (
-            <Mutation mutation={this.UPDATE_NOTE} >
+            <Mutation
+                mutation={UPDATE_NOTE}
+            /*update={(cache, { data: { updateNote } }) => {
+                try {
+                    const data = cache.readQuery({ query: NOTES })
+                    console.log('notes', data.notes[data.notes.length - 1])
+                    data.notes = data.notes.map(note => {
+                        if (note._id === updateNote._id) note = updateNote;
+                        return note
+                    })
+                    console.log('notes after', data.notes[data.notes.length - 1])
+                    cache.writeQuery({
+                        query: NOTES,
+                        data: data
+                    });
+                } catch (error) {
+                    console.log(error)
+                }
+            }}*/
+            >
                 {(updateNote) => (
-                    <Mutation mutation={this.CREATE_NOTE}>
+                    <Mutation
+                        mutation={CREATE_NOTE}
+                    /*update={(cache, { data: { createNote } }) => {
+                        try {
+                            const data = cache.readQuery({ query: NOTES })
+                            data.notes.push(createNote)
+                            cache.writeQuery({
+                                query: NOTES,
+                                data: data
+                            });
+                        } catch (error) {
+                            console.log(error)
+                        }
+                    }}*/
+                    >
                         {(createNote) => (
                             <Mutation
-                                mutation={this.REMOVE_NOTE}
+                                mutation={REMOVE_NOTE}
                                 variables={{ inputId: this.props.noteValue._id }}
+
+                            /*update={(cache, { data: { removeNote } }) => {
+                                try {
+                                    const notes = cache.readQuery({ query: NOTES });
+                                    notes.notes = notes.notes.map(note => {
+                                        if (note._id === removeNote) note.isActive = false;
+                                        return note
+                                    })
+                                    cache.writeQuery({
+                                        query: NOTES,
+                                        data: notes
+                                    });
+                                } catch (error) {
+                                    console.log(error)
+                                }
+                            }}*/
                             >
                                 {(removeNote) => (
                                     <div>
@@ -76,7 +96,7 @@ class NoteItem extends React.Component {
                                                             onChange={this.handleChange}
                                                             onBlur={() => {
                                                                 // update state on client
-                                                                this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
+                                                                // this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
                                                                 this.props.noteValue._id ?
                                                                     // call mutation, pass in variables option
                                                                     updateNote({
@@ -98,6 +118,7 @@ class NoteItem extends React.Component {
                                                                             }
                                                                         }
                                                                     })
+                                                                this.props.refetchData()
                                                             }}
                                                             placeholder="Note content"
                                                         />}
@@ -109,7 +130,7 @@ class NoteItem extends React.Component {
                                                             disabled={this.props.noteValue.saved ? true : false}
                                                             onClick={() => {
                                                                 // update state on client
-                                                                this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
+                                                                // this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
                                                                 this.props.noteValue._id ?
                                                                     // call mutation, pass in variables option for update
                                                                     updateNote({
@@ -131,13 +152,15 @@ class NoteItem extends React.Component {
                                                                             }
                                                                         }
                                                                     })
+                                                                this.props.refetchData()
                                                             }}
                                                         ><Icon type="save" /></Button>
                                                         <Button
                                                             type="danger"
-                                                            onClick={() => {
-                                                                this.props.onRemoveNote(this.props.index);
-                                                                removeNote();
+                                                            onClick={async () => {
+                                                                // this.props.onRemoveNote(this.props.index);
+                                                                removeNote()
+                                                                this.props.refetchData()
                                                             }}
                                                         ><Icon type="delete" /></Button>
                                                     </Row>

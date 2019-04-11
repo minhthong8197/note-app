@@ -13,16 +13,19 @@ class MyBody extends React.Component {
             listNotes: [],
         }
         this.onAddNote = this.onAddNote.bind(this)
-        this.onRemoveNote = this.onRemoveNote.bind(this)
+        // this.onRemoveNote = this.onRemoveNote.bind(this)
         this.onNoteChange = this.onNoteChange.bind(this)
+        this.refetchData = this.refetchData.bind(this)
     }
 
-    static getDerivedStateFromProps(props, state) {
-        if (state.listNotes.length === 0) return { listNotes: [...props.listNotes] }
-        else {
-            return state
-        }
-        // return { listNotes: [...props.listNotes] }
+    componentDidMount() {
+        // this.refetchData()
+        this.setState({ listNotes: [...this.props.listNotes] })
+    }
+
+    async refetchData() {
+        await this.props.refetch()
+        this.setState({ listNotes: [...this.props.listNotes] })
     }
 
     renderNoteItems() {
@@ -34,6 +37,7 @@ class MyBody extends React.Component {
                     noteValue={noteValue}
                     onRemoveNote={this.onRemoveNote}
                     onNoteChange={this.onNoteChange}
+                    refetchData={this.refetchData}
                 />
             ))
     }
@@ -50,15 +54,15 @@ class MyBody extends React.Component {
         })
     }
 
-    onRemoveNote(i) {
-        let newList = [
-            ...this.state.listNotes.slice(0, i),
-            ...this.state.listNotes.slice(i + 1)
-        ]
-        this.setState({
-            listNotes: newList
-        })
-    }
+    // onRemoveNote(i) {
+    //     let newList = [
+    //         ...this.state.listNotes.slice(0, i),
+    //         ...this.state.listNotes.slice(i + 1)
+    //     ]
+    //     this.setState({
+    //         listNotes: newList
+    //     })
+    // }
 
     onNoteChange(noteValue, i) {
         let newList = [...this.state.listNotes]

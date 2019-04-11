@@ -10,6 +10,14 @@ import { any } from 'prop-types';
 export class NoteService {
     constructor(@InjectRepository(Note) private noteRepository = getMongoRepository(Note)) { }
 
+    async testAsync() {
+        console.log('1')
+        const temp1 = await this.noteRepository.findOne()
+        console.log('2', temp1)
+        const temp2 = await this.noteRepository.findOne()
+        console.log('3', temp2)
+    }
+
     async getNotes(): Promise<Note[] | any> {
         return await this.noteRepository.find()
     }
