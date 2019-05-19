@@ -13,18 +13,16 @@ class MyBody extends React.Component {
             listNotes: [],
         }
         this.onAddNote = this.onAddNote.bind(this)
-        // this.onRemoveNote = this.onRemoveNote.bind(this)
         this.onNoteChange = this.onNoteChange.bind(this)
-        this.refetchData = this.refetchData.bind(this)
+        this.updateState = this.updateState.bind(this)
     }
 
     componentDidMount() {
-        // this.refetchData()
         this.setState({ listNotes: [...this.props.listNotes] })
     }
 
-    async refetchData() {
-        await this.props.refetch()
+    updateState() {
+        // await this.props.refetch()
         this.setState({ listNotes: [...this.props.listNotes] })
     }
 
@@ -35,9 +33,8 @@ class MyBody extends React.Component {
                     key={i}
                     index={i}
                     noteValue={noteValue}
-                    onRemoveNote={this.onRemoveNote}
                     onNoteChange={this.onNoteChange}
-                    refetchData={this.refetchData}
+                    updateState={this.updateState}
                 />
             ))
     }

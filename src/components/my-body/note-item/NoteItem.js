@@ -24,60 +24,59 @@ class NoteItem extends React.Component {
         return (
             <Mutation
                 mutation={UPDATE_NOTE}
-            /*update={(cache, { data: { updateNote } }) => {
-                try {
-                    const data = cache.readQuery({ query: NOTES })
-                    console.log('notes', data.notes[data.notes.length - 1])
-                    data.notes = data.notes.map(note => {
-                        if (note._id === updateNote._id) note = updateNote;
-                        return note
-                    })
-                    console.log('notes after', data.notes[data.notes.length - 1])
-                    cache.writeQuery({
-                        query: NOTES,
-                        data: data
-                    });
-                } catch (error) {
-                    console.log(error)
-                }
-            }}*/
+                update={(cache, { data: { updateNote } }) => {
+                    try {
+                        const data = cache.readQuery({ query: NOTES })
+                        data.notes = data.notes.map(note => {
+                            if (note._id === updateNote._id) {
+                                note = Object.assign({}, updateNote);
+                            }
+                            return note
+                        })
+                        cache.writeQuery({
+                            query: NOTES,
+                            data: data
+                        });
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }}
             >
                 {(updateNote) => (
                     <Mutation
                         mutation={CREATE_NOTE}
-                    /*update={(cache, { data: { createNote } }) => {
-                        try {
-                            const data = cache.readQuery({ query: NOTES })
-                            data.notes.push(createNote)
-                            cache.writeQuery({
-                                query: NOTES,
-                                data: data
-                            });
-                        } catch (error) {
-                            console.log(error)
-                        }
-                    }}*/
+                        update={(cache, { data: { createNote } }) => {
+                            try {
+                                const data = cache.readQuery({ query: NOTES })
+                                data.notes.push(createNote)
+                                cache.writeQuery({
+                                    query: NOTES,
+                                    data: data
+                                });
+                            } catch (error) {
+                                console.log(error)
+                            }
+                        }}
                     >
                         {(createNote) => (
                             <Mutation
                                 mutation={REMOVE_NOTE}
                                 variables={{ inputId: this.props.noteValue._id }}
-
-                            /*update={(cache, { data: { removeNote } }) => {
-                                try {
-                                    const notes = cache.readQuery({ query: NOTES });
-                                    notes.notes = notes.notes.map(note => {
-                                        if (note._id === removeNote) note.isActive = false;
-                                        return note
-                                    })
-                                    cache.writeQuery({
-                                        query: NOTES,
-                                        data: notes
-                                    });
-                                } catch (error) {
-                                    console.log(error)
-                                }
-                            }}*/
+                                update={(cache, { data: { removeNote } }) => {
+                                    try {
+                                        const data = cache.readQuery({ query: NOTES })
+                                        data.notes = data.notes.map(note => {
+                                            if (note._id === removeNote) note.isActive = false;
+                                            return note
+                                        })
+                                        cache.writeQuery({
+                                            query: NOTES,
+                                            data: data
+                                        });
+                                    } catch (error) {
+                                        console.log(error)
+                                    }
+                                }}
                             >
                                 {(removeNote) => (
                                     <div>
@@ -92,35 +91,9 @@ class NoteItem extends React.Component {
                                                         :
                                                         <Input
                                                             name="content"
+                                                            placeholder="Note content"
                                                             value={this.props.noteValue.content}
                                                             onChange={this.handleChange}
-                                                            onBlur={() => {
-                                                                // update state on client
-                                                                // this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
-                                                                this.props.noteValue._id ?
-                                                                    // call mutation, pass in variables option
-                                                                    updateNote({
-                                                                        variables: {
-                                                                            id: this.props.noteValue._id,
-                                                                            data: {
-                                                                                content: this.props.noteValue.content,
-                                                                                saved: true
-                                                                            }
-                                                                        }
-                                                                    })
-                                                                    :
-                                                                    // call mutation, pass in variables option
-                                                                    createNote({
-                                                                        variables: {
-                                                                            data: {
-                                                                                content: this.props.noteValue.content,
-                                                                                saved: true
-                                                                            }
-                                                                        }
-                                                                    })
-                                                                this.props.refetchData()
-                                                            }}
-                                                            placeholder="Note content"
                                                         />}
                                                 </Col>
 
@@ -128,12 +101,10 @@ class NoteItem extends React.Component {
                                                     <Row type="flex" justify="end">
                                                         <Button
                                                             disabled={this.props.noteValue.saved ? true : false}
-                                                            onClick={() => {
-                                                                // update state on client
-                                                                // this.props.onNoteChange({ saved: true, content: this.props.noteValue.content }, this.props.index)
+                                                            onClick={async () => {
+                                                                // call mutation, pass in variables option
                                                                 this.props.noteValue._id ?
-                                                                    // call mutation, pass in variables option for update
-                                                                    updateNote({
+                                                                    await updateNote({
                                                                         variables: {
                                                                             id: this.props.noteValue._id,
                                                                             data: {
@@ -143,8 +114,7 @@ class NoteItem extends React.Component {
                                                                         }
                                                                     })
                                                                     :
-                                                                    // call mutation, pass in variables option for create
-                                                                    createNote({
+                                                                    await createNote({
                                                                         variables: {
                                                                             data: {
                                                                                 content: this.props.noteValue.content,
@@ -152,15 +122,14 @@ class NoteItem extends React.Component {
                                                                             }
                                                                         }
                                                                     })
-                                                                this.props.refetchData()
+                                                                this.props.updateState()
                                                             }}
                                                         ><Icon type="save" /></Button>
                                                         <Button
                                                             type="danger"
                                                             onClick={async () => {
-                                                                // this.props.onRemoveNote(this.props.index);
-                                                                removeNote()
-                                                                this.props.refetchData()
+                                                                await removeNote()
+                                                                this.props.updateState()
                                                             }}
                                                         ><Icon type="delete" /></Button>
                                                     </Row>
