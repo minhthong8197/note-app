@@ -2,15 +2,13 @@ import React from 'react'
 import { Row, Col, Icon, Button, Input } from 'antd'
 import 'antd/dist/antd.css'
 import './NoteItem.css'
-import { Mutation } from 'react-apollo'
-// eslint-disable-next-line
+import { graphql, compose } from 'react-apollo'
 import {
   NOTES,
   CREATE_NOTE,
   UPDATE_NOTE,
   REMOVE_NOTE
 } from '../../../services/query'
-import { graphql } from 'react-apollo'
 
 class NoteItem extends React.Component {
   constructor(props) {
@@ -28,130 +26,109 @@ class NoteItem extends React.Component {
 
   render() {
     return (
-      <Mutation
-        mutation={REMOVE_NOTE}
-        variables={{ inputId: this.props.noteValue._id }}
-        update={(cache, { data: { removeNote } }) => {
-          try {
-            const data = cache.readQuery({ query: NOTES })
-            data.notes = data.notes.map(note => {
-              if (note._id === removeNote) note.isActive = false
-              return note
-            })
-            cache.writeQuery({
-              query: NOTES,
-              data: data
-            })
-          } catch (error) {
-            console.log(error)
-          }
-        }}
-      >
-        {removeNote => (
-          <div>
-            {this.props.noteValue.isActive ? (
-              <Row type='flex' justify='end' className='margin'>
-                <Col className='note-input'>
-                  {this.props.noteValue.saved ? (
-                    <p
-                      className='note-text'
-                      onDoubleClick={() =>
-                        this.props.onNoteChange(
-                          {
-                            saved: false,
-                            content: this.props.noteValue.content
-                          },
-                          this.props.index
-                        )
-                      }
-                    >
-                      {this.props.noteValue.content}
-                    </p>
-                  ) : (
-                    <Input
-                      name='content'
-                      placeholder='Note content'
-                      value={this.props.noteValue.content}
-                      onChange={this.handleChange}
-                    />
-                  )}
-                </Col>
+      <div>
+        {this.props.noteValue.isActive ? (
+          <Row type='flex' justify='end' className='margin'>
+            <Col className='note-input'>
+              {this.props.noteValue.saved ? (
+                <p
+                  className='note-text'
+                  onDoubleClick={() =>
+                    this.props.onNoteChange(
+                      {
+                        saved: false,
+                        content: this.props.noteValue.content
+                      },
+                      this.props.index
+                    )
+                  }
+                >
+                  {this.props.noteValue.content}
+                </p>
+              ) : (
+                <Input
+                  name='content'
+                  placeholder='Note content'
+                  value={this.props.noteValue.content}
+                  onChange={this.handleChange}
+                />
+              )}
+            </Col>
 
-                <Col className='note-tools'>
-                  <Row type='flex' justify='end'>
-                    <Button
-                      disabled={this.props.noteValue.saved ? true : false}
-                      onClick={async () => {
-                        // call mutation, pass in variables option
-                        this.props.noteValue._id
-                          ? await this.props.updateNote({
-                              variables: {
-                                id: this.props.noteValue._id,
-                                data: {
-                                  content: this.props.noteValue.content,
-                                  saved: true
-                                }
-                              }
-                            })
-                          : await this.props.createNote({
-                              variables: {
-                                data: {
-                                  content: this.props.noteValue.content,
-                                  saved: true
-                                }
-                              }
-                            })
-                        this.props.updateState()
-                      }}
-                    >
-                      <Icon type='save' />
-                    </Button>
-                    <Button
-                      type='danger'
-                      onClick={async () => {
-                        await this.props.removeNote({
-                          variables: { inputId: this.props.noteValue._id }
+            <Col className='note-tools'>
+              <Row type='flex' justify='end'>
+                <Button
+                  disabled={this.props.noteValue.saved ? true : false}
+                  onClick={async () => {
+                    // call mutation, pass in variables option
+                    this.props.noteValue._id
+                      ? await this.props.updateNote({
+                          variables: {
+                            id: this.props.noteValue._id,
+                            data: {
+                              content: this.props.noteValue.content,
+                              saved: true
+                            }
+                          }
                         })
-                        this.props.updateState()
-                      }}
-                    >
-                      <Icon type='delete' />
-                    </Button>
-                  </Row>
-                </Col>
+                      : await this.props.createNote({
+                          variables: {
+                            data: {
+                              content: this.props.noteValue.content,
+                              saved: true
+                            }
+                          }
+                        })
+                    this.props.updateState()
+                  }}
+                >
+                  <Icon type='save' />
+                </Button>
+                <Button
+                  type='danger'
+                  onClick={async () => {
+                    await this.props.removeNote({
+                      variables: { inputId: this.props.noteValue._id }
+                    })
+                    this.props.updateState()
+                  }}
+                >
+                  <Icon type='delete' />
+                </Button>
               </Row>
-            ) : (
-              <div />
-            )}
-          </div>
+            </Col>
+          </Row>
+        ) : (
+          <div />
         )}
-      </Mutation>
+      </div>
     )
   }
 }
 
-export default graphql(UPDATE_NOTE, {
-  name: 'updateNote',
-  options: {
-    update: (dataProxy, { data: { updateNote } }) => {
-      try {
-        const data = dataProxy.readQuery({ query: NOTES })
-        data.notes = data.notes.map(note => {
-          if (note._id === updateNote._id) {
-            note = Object.assign({}, updateNote)
-          }
-          return note
-        })
-        dataProxy.writeQuery({
-          query: NOTES,
-          data: data
-        })
-      } catch (error) {
-        console.log(error)
+export default compose(
+  graphql(UPDATE_NOTE, {
+    name: 'updateNote',
+    options: {
+      update: (dataProxy, { data: { updateNote } }) => {
+        try {
+          const data = dataProxy.readQuery({ query: NOTES })
+          data.notes = data.notes.map(note => {
+            if (note._id === updateNote._id) {
+              note = Object.assign({}, updateNote)
+            }
+            return note
+          })
+          dataProxy.writeQuery({
+            query: NOTES,
+            data: data
+          })
+        } catch (error) {
+          console.log(error)
+        }
       }
     }
-  }
-})(
+  }),
   graphql(CREATE_NOTE, {
     name: 'createNote',
     options: {
@@ -168,26 +145,25 @@ export default graphql(UPDATE_NOTE, {
         }
       }
     }
-  })(
-    graphql(REMOVE_NOTE, {
-      name: 'removeNote',
-      options: {
-        update: (cache, { data: { removeNote } }) => {
-          try {
-            const data = cache.readQuery({ query: NOTES })
-            data.notes = data.notes.map(note => {
-              if (note._id === removeNote) note.isActive = false
-              return note
-            })
-            cache.writeQuery({
-              query: NOTES,
-              data: data
-            })
-          } catch (error) {
-            console.log(error)
-          }
+  }),
+  graphql(REMOVE_NOTE, {
+    name: 'removeNote',
+    options: {
+      update: (cache, { data: { removeNote } }) => {
+        try {
+          const data = cache.readQuery({ query: NOTES })
+          data.notes = data.notes.map(note => {
+            if (note._id === removeNote) note.isActive = false
+            return note
+          })
+          cache.writeQuery({
+            query: NOTES,
+            data: data
+          })
+        } catch (error) {
+          console.log(error)
         }
       }
-    })(NoteItem)
-  )
-)
+    }
+  })
+)(NoteItem)
