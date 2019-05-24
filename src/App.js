@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import './App.css';
-import { Query } from 'react-apollo'
+import React, { Component } from 'react'
+import './App.css'
+import { graphql } from 'react-apollo'
 
 import Header from './components/header/Header'
 import MyBody from './components/my-body/MyBody'
@@ -11,18 +11,19 @@ class App extends Component {
     return (
       <div>
         <Header />
-        <Query query={NOTES}>
-          {({ loading, error, data, refetch }) => {
-            if (loading) return <p>Loading...</p>
-            if (error) return <p>Error!!!</p>
-            if (data) {
-              return <MyBody refetch={refetch} listNotes={data.notes} />
-            }
-          }}
-        </Query>
+        {this.props.data.loading ? (
+          <p>Loading...</p>
+        ) : this.props.data.error ? (
+          <p>Error!!!</p>
+        ) : (
+          <MyBody
+            refetch={this.props.data.refetch}
+            listNotes={this.props.data.notes}
+          />
+        )}
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default graphql(NOTES)(App)
